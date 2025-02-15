@@ -1,4 +1,7 @@
-"scripts": {
-  "start": "node server.js",
-  "test": "jest"
+{
+  "scripts": {
+    "start": "node server.js",
+    "test": "jest"
+  }
 }
+
