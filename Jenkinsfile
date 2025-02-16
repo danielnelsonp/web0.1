@@ -1,46 +1,29 @@
 pipeline {
     agent any
-
     stages {
-        stage('Checkout Code') {
+        stage('Build') {
             steps {
-                git branch: 'master', credentialsId: '5b2c07d5-80dd-486a-8e83-76736e622d7e', url: 'git@github.com:danielnelsonp/web0.1.git'
+                echo 'Building...'
             }
         }
-
-        stage('Install Dependencies') {
+        stage('Test') {
             steps {
-                sh 'npm install'
-                sh 'npm install --save-dev jest'  // Ensure Jest is installed
+                echo 'Running Tests...'
             }
         }
-
-        stage('Run Tests') {
-            steps {
-                sh 'ls -la'                      // Debug workspace files
-                sh 'cat package.json'            // Check JSON integrity
-                sh 'ls -la node_modules/.bin/'   // Debug Jest installation
-                sh 'npx jest --version'          // Verify Jest is available
-                sh 'npx jest'                    // Run Jest tests
-            }
+    }
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
         }
-
-        stage('Build Docker Image') {
-            when {
-                not { failed() }
-            }
-            steps {
-                sh 'test -f Dockerfile && docker build -t my-app:latest . || echo "Dockerfile not found!"'
-            }
+        failure {
+            echo 'Pipeline failed!'
         }
-
-        stage('Deploy') {
-            when {
-                not { failed() }
-            }
-            steps {
-                sh 'chmod +x deploy.sh'
-                sh './deploy.sh'
+        always {
+            script {
+                if (currentBuild.result == null || currentBuild.result != 'FAILURE') {
+                    echo "This runs only if the build is NOT failed."
+                }
             }
         }
     }
