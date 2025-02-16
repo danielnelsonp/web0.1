@@ -5,9 +5,12 @@
     "start": "node server.js",
     "test": "jest"
   },
-  "dependencies": {},
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  },
   "devDependencies": {
     "jest": "^29.7.0"
   }
 }
-
