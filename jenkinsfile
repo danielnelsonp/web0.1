@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        NODEJS_HOME = tool 'nodejs' 
+        NODEJS_HOME = tool 'nodejs'
         PATH = "${NODEJS_HOME}/bin:${env.PATH}"
     }
 
@@ -12,16 +12,19 @@ pipeline {
                 git 'https://github.com/danielnelsonp/web0.1.git'
             }
         }
-        
+
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
+                sh '''
+                    npm install
+                    npm list jest || npm install --save-dev jest
+                '''
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'npm test'
+                sh 'npx jest'
             }
         }
 
