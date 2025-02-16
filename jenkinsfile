@@ -11,20 +11,21 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 sh 'npm install'
+                sh 'npm install --save-dev jest'  // Ensure Jest is installed
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'npx jest'  // Ensures Jest runs from local node_modules
+                sh 'ls -la node_modules/.bin/'  // Debug Jest installation
+                sh 'npx jest --version'         // Verify Jest is available
+                sh 'npx jest'                   // Run Jest tests
             }
         }
 
         stage('Build Docker Image') {
             when {
-                not {
-                    failed()
-                }
+                not { failed() }
             }
             steps {
                 sh 'docker build -t my-app:latest .'
@@ -33,9 +34,7 @@ pipeline {
 
         stage('Deploy') {
             when {
-                not {
-                    failed()
-                }
+                not { failed() }
             }
             steps {
                 sh './deploy.sh'
