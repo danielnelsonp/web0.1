@@ -17,7 +17,9 @@ pipeline {
             steps {
                 sh '''
                     npm install
-                    npm list jest || npm install --save-dev jest
+                    if ! npx jest --version > /dev/null 2>&1; then
+                        npm install --save-dev jest
+                    fi
                 '''
             }
         }
