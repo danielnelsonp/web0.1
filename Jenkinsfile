@@ -1,34 +1,58 @@
 pipeline {
     agent any
+
+    environment {
+        PATH = "/usr/local/bin:$PATH" // Ensure npm is in the PATH
+    }
+
+    tools {
+        nodejs 'NodeJS' // Ensure Node.js is available in Jenkins
+    }
+
     stages {
+        stage('Setup') {
+            steps {
+                echo 'Checking Node.js and npm installation...'
+                sh '''
+                if ! command -v node >/dev/null 2>&1; then
+                    echo "Node.js not found. Installing..."
+                    curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+                    sudo apt-get install -y nodejs
+                fi
+                node -v
+                npm -v
+                '''
+            }
+        }
+        
         stage('Build') {
             steps {
                 echo 'Building...'
-                // Add build commands here
-                sh 'npm install' // Example: Installing dependencies
+                sh 'npm install' // Installing dependencies
             }
         }
+
         stage('Test') {
             steps {
                 echo 'Running Tests...'
-                // Add test scripts here
-                sh 'npm test' // Example: Running tests
+                sh 'npm test' // Running tests
             }
         }
+
         stage('Deploy') {
             steps {
                 echo 'Deploying application...'
-                // Add deployment steps here
-                sh 'docker build -t myapp .' // Example: Docker build
-                sh 'docker run -d -p 8080:80 myapp' // Example: Running container
+                sh 'docker build -t myapp .' // Docker build
+                sh 'docker run -d -p 8080:80 myapp' // Running container
             }
         }
     }
+
     post {
         success {
             echo 'Pipeline completed successfully!'
             echo 'Monitoring job history for stability...'
-            sh 'jenkins-cli list-jobs' // Example: Monitoring Jenkins jobs
+            sh 'jenkins-cli list-jobs' // Monitoring Jenkins jobs
         }
         failure {
             echo 'Pipeline failed!'
