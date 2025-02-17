@@ -24,7 +24,7 @@ pipeline {
                 '''
             }
         }
-        
+
         stage('Build') {
             steps {
                 echo 'Building...'
@@ -52,7 +52,7 @@ pipeline {
         success {
             echo 'Pipeline completed successfully!'
             echo 'Monitoring job history for stability...'
-            sh 'jenkins-cli list-jobs' // Monitoring Jenkins jobs
+            // Removed jenkins-cli command
         }
         failure {
             echo 'Pipeline failed!'
