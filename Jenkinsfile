@@ -42,35 +42,33 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying application...'
-                
-                // Build the Docker image
-                sh 'docker build -t myapp .'
-                
-                // Check if the port is already in use
+                sh 'docker build -t myapp .' // Docker build
+
+                // Check for port conflicts and find an available port
                 script {
-                    def portInUse = false
                     def port = 8081
+                    def availablePort = port
+                    def maxTries = 10
+                    def tries = 0
 
-                    // Check if the port is in use
-                    def checkPortCmd = "lsof -i :${port}"
-                    def result = sh(script: checkPortCmd, returnStatus: true)
-
-                    if (result == 0) {
-                        echo "Port ${port} is already in use."
-                        portInUse = true
-                    } else {
-                        echo "Port ${port} is available."
+                    while (tries < maxTries) {
+                        def result = sh(script: "lsof -i :${availablePort}", returnStatus: true, script: true)
+                        if (result != 0) {
+                            echo "Port ${availablePort} is available."
+                            break
+                        } else {
+                            tries++
+                            availablePort++
+                            echo "Port ${availablePort - 1} is occupied. Trying port ${availablePort}."
+                        }
                     }
 
-                    // If the port is in use, try a different port
-                    if (portInUse) {
-                        def newPort = 8082
-                        echo "Switching to port ${newPort}."
-                        sh "docker run -d -p ${newPort}:80 myapp"
-                    } else {
-                        // Port is available, proceed with deployment
-                        sh "docker run -d -p ${port}:80 myapp"
+                    if (tries == maxTries) {
+                        error "Unable to find an available port after ${maxTries} tries."
                     }
+
+                    // Run the Docker container on the available port
+                    sh "docker run -d -p ${availablePort}:80 myapp"
                 }
             }
         }
@@ -79,8 +77,6 @@ pipeline {
     post {
         success {
             echo 'Pipeline completed successfully!'
-            echo 'Monitoring job history for stability...'
-            // Removed jenkins-cli command
         }
         failure {
             echo 'Pipeline failed!'
