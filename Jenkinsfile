@@ -42,8 +42,36 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying application...'
-                sh 'docker build -t myapp .' // Docker build
-                sh 'docker run -d -p 8081:80 myapp' // Running container
+                
+                // Build the Docker image
+                sh 'docker build -t myapp .'
+                
+                // Check if the port is already in use
+                script {
+                    def portInUse = false
+                    def port = 8081
+
+                    // Check if the port is in use
+                    def checkPortCmd = "lsof -i :${port}"
+                    def result = sh(script: checkPortCmd, returnStatus: true)
+
+                    if (result == 0) {
+                        echo "Port ${port} is already in use."
+                        portInUse = true
+                    } else {
+                        echo "Port ${port} is available."
+                    }
+
+                    // If the port is in use, try a different port
+                    if (portInUse) {
+                        def newPort = 8082
+                        echo "Switching to port ${newPort}."
+                        sh "docker run -d -p ${newPort}:80 myapp"
+                    } else {
+                        // Port is available, proceed with deployment
+                        sh "docker run -d -p ${port}:80 myapp"
+                    }
+                }
             }
         }
     }
