@@ -1,5 +1,4 @@
-
-peline {
+pipeline {
     agent any
 
     environment {
@@ -67,17 +66,4 @@ peline {
         }
     }
 }
-lHost *:80>
-    ServerAdmin admin@localhost
-    DocumentRoot /var/www/html/drupal
-    ServerName drupal.local
-
-    <Directory /var/www/html/drupal>
-        AllowOverride All
-        Require all granted
-    </Directory>
-
-    ErrorLog ${APACHE_LOG_DIR}/error.log
-    CustomLog ${APACHE_LOG_DIR}/access.log combined
-</VirtualHost>
 
