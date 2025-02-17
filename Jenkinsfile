@@ -43,7 +43,7 @@ pipeline {
             steps {
                 echo 'Deploying application...'
                 sh 'docker build -t myapp .' // Docker build
-                sh 'docker run -d -p 8080:80 myapp' // Running container
+                sh 'docker run -d -p 8081:80 myapp' // Running container
             }
         }
     }
