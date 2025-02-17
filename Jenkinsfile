@@ -43,7 +43,7 @@ pipeline {
             steps {
                 echo 'Deploying application...'
                 sh 'docker build -t myapp .' // Docker build
-                sh 'docker run -d -p 8081:80 myapp' // Running container
+                sh 'docker run -d -p 3000:3000 myapp' // Running container with correct port mapping
             }
         }
     }
